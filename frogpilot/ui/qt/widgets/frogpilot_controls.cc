@@ -32,14 +32,16 @@ void loadImage(const QString &basePath, QPixmap &pixmap, QSharedPointer<QMovie> 
   if (gifFile.exists()) {
     QSharedPointer<QMovie> gif(new QMovie(gifFile.filePath()));
     if (!gif->isValid()) {
-      pixmap = loadPixmap(basePath + ".png", size, aspectRatioMode);
+      QImage image(basePath + ".png");
+      image = image.convertToFormat(QImage::Format_Indexed8);
+      pixmap = QPixmap::fromImage(image).scaled(size, aspectRatioMode, Qt::SmoothTransformation);
       return;
     }
 
     gif->setCacheMode(QMovie::CacheAll);
     gif->setScaledSize(size);
 
-    QObject::connect(gif.data(), &QMovie::frameChanged, parent, [parent](int) {parent->update();}, Qt::UniqueConnection);
+    QObject::connect(gif.data(), &QMovie::frameChanged, parent, [parent](int) { parent->update(); }, Qt::UniqueConnection);
 
     gif->start();
 
@@ -47,7 +49,9 @@ void loadImage(const QString &basePath, QPixmap &pixmap, QSharedPointer<QMovie> 
 
     pixmap = QPixmap();
   } else {
-    pixmap = loadPixmap(basePath + ".png", size, aspectRatioMode);
+    QImage image(basePath + ".png");
+    image = image.convertToFormat(QImage::Format_Indexed8);
+    pixmap = QPixmap::fromImage(image).scaled(size, aspectRatioMode, Qt::SmoothTransformation);
   }
 
   parent->update();
@@ -64,11 +68,15 @@ QColor loadThemeColors(const QString &colorKey, bool clearCache) {
 
   if (clearCache) {
     QFile file("../../frogpilot/assets/active_theme/colors/colors.json");
-
     if (file.open(QIODevice::ReadOnly)) {
       cachedColorData = QJsonDocument::fromJson(file.readAll()).object();
     } else {
+      cachedColorData = QJsonObject();
       return QColor();
+    }
+
+    if (colorKey.isEmpty()) {
+      return QColor(255, 255, 255);
     }
   }
 
@@ -76,7 +84,7 @@ QColor loadThemeColors(const QString &colorKey, bool clearCache) {
     return QColor();
   }
 
-  const QJsonObject &colorObj = cachedColorData[colorKey].toObject();
+  const QJsonObject colorObj = cachedColorData[colorKey].toObject();
   return QColor(
     colorObj.value("red").toInt(255),
     colorObj.value("green").toInt(255),
