@@ -156,6 +156,7 @@ FrogPilotVehiclesPanel::FrogPilotVehiclesPanel(FrogPilotSettingsWindow *parent) 
   std::vector<std::tuple<QString, QString, QString, QString>> vehicleToggles {
     {"GMToggles", tr("General Motors Settings"), tr("Settings specific to <b>General Motors</b> vehicles."), ""},
     {"ExperimentalGMTune", tr("FrogsGoMoo's Experimental Tune"), tr("<b>FrogsGoMoo's</b> experimental <b>General Motors</b> tune that aims to smoothen out stopping and takeoff control based on nothing but guesswork. Use at your own risk!"), ""},
+    {"CSLCEnabled", tr("GM CSLC"), tr("Set cars cruise speed based on SLC, MTSC, VTSC, & CEM.\n\nTurns OpenPilot Longitudnal Control off for camera ACC cars."), ""},
     {"LongPitch", tr("Smooth Pedal Response on Hills"), tr("Smoothen the acceleration and braking when driving uphill or downhill."), ""},
     {"VoltSNG", tr("Stop and Go Hack"), tr("Force stop and go on the <b>2017 Chevy Volt</b>."), ""},
 
@@ -242,7 +243,7 @@ FrogPilotVehiclesPanel::FrogPilotVehiclesPanel(FrogPilotSettingsWindow *parent) 
 
   static_cast<FrogPilotParamValueControl*>(toggles["LockDoorsTimer"])->setWarning("<b>Warning:</b> openpilot can't detect if keys are still inside the car, so ensure you have a spare key to prevent accidental lockouts!");
 
-  std::set<QString> rebootKeys = {"NewLongAPI", "TacoTuneHacks"};
+  std::set<QString> rebootKeys = {"CSLCEnabled", "NewLongAPI", "TacoTuneHacks"};
   for (const QString &key : rebootKeys) {
     QObject::connect(static_cast<ToggleControl*>(toggles[key]), &ToggleControl::toggleFlipped, [this, key](bool state) {
       if (started) {

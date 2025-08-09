@@ -95,7 +95,7 @@ class CarController(CarControllerBase):
 
     self.stock_max_accel = self.params.ACCEL_MAX
 
-  def update(self, CC, CS, now_nanos, frogpilot_toggles):
+  def update(self, CC, CS, now_nanos, experimental_mode, v_cruise, frogpilot_toggles):
     if frogpilot_toggles.sport_plus and (CS.out.gearShifter == GearShifter.sport or not frogpilot_toggles.map_acceleration):
       self.params.ACCEL_MAX = get_max_allowed_accel(CS.out.vEgo)
       self.long_pid.pos_limit = self.params.ACCEL_MAX

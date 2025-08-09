@@ -215,7 +215,7 @@ void FrogPilotSettingsWindow::updateVariables() {
     hasExperimentalOpenpilotLongitudinal = CP.getExperimentalLongitudinalAvailable();
     hasNNFFLog = nnffLogFileExists(QString::fromStdString(carFingerprint));
     hasOpenpilotLongitudinal = hasLongitudinalControl(CP);
-    hasPCMCruise = CP.getPcmCruise();
+    hasPCMCruise = CP.getPcmCruise() && !params.getBool("CSLCEnabled");
     hasPedal = CP.getEnableGasInterceptor();
     hasRadar = !CP.getRadarUnavailable();
     hasSNG = CP.getAutoResumeSng();

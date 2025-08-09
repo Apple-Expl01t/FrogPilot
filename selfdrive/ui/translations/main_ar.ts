@@ -3516,6 +3516,18 @@ Want to submit your own animations? Share them in the "custom-themes" channel on
         <source> seconds</source>
         <translation type="gpt-4o-generated">ثواني</translation>
     </message>
+    <message>
+        <source>GM CSLC</source>
+        <translation type="gpt-4o-generated">جي إم سي إس إل سي</translation>
+    </message>
+    <message>
+        <source>Set cars cruise speed based on SLC, MTSC, VTSC, &amp; CEM.
+
+Turns OpenPilot Longitudnal Control off for camera ACC cars.</source>
+        <translation type="gpt-4o-generated">تعيين سرعة تثبيت السيارات بناءً على SLC، MTSC، VTSC، وCEM.
+
+يقوم بإيقاف تشغيل التحكم الطولي لـ OpenPilot للسيارات المزودة بكاميرا ACC.</translation>
+    </message>
 </context>
 <context>
     <name>FrogPilotVisualsPanel</name>

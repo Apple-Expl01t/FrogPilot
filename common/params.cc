@@ -271,6 +271,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ColorToDownload", CLEAR_ON_MANAGER_START},
     {"Compass", PERSISTENT},
     {"ConditionalExperimental", PERSISTENT},
+    {"CSLCEnabled", PERSISTENT},
     {"CurveSensitivity", PERSISTENT},
     {"CurveSpeedControl", PERSISTENT},
     {"CustomAlerts", PERSISTENT},

@@ -3516,6 +3516,18 @@ Want to submit your own animations? Share them in the "custom-themes" channel on
         <source> seconds</source>
         <translation type="gpt-4o-generated">segundos</translation>
     </message>
+    <message>
+        <source>GM CSLC</source>
+        <translation type="gpt-4o-generated">GM CSLC</translation>
+    </message>
+    <message>
+        <source>Set cars cruise speed based on SLC, MTSC, VTSC, &amp; CEM.
+
+Turns OpenPilot Longitudnal Control off for camera ACC cars.</source>
+        <translation type="gpt-4o-generated">Establece la velocidad de crucero de los coches basada en SLC, MTSC, VTSC y CEM.
+
+Desactiva el control longitudinal de OpenPilot para coches con cámara ACC.</translation>
+    </message>
 </context>
 <context>
     <name>FrogPilotVisualsPanel</name>
