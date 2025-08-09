@@ -30,8 +30,8 @@ from openpilot.system.loggerd.deleter import PRESERVE_ATTR_NAME, PRESERVE_ATTR_V
 from openpilot.system.version import get_build_metadata
 from panda import Panda
 
-from openpilot.frogpilot.assets.theme_manager import HOLIDAY_THEME_PATH
-from openpilot.frogpilot.common.frogpilot_utilities import delete_file, get_lock_status, run_cmd
+from openpilot.frogpilot.assets.theme_manager import HOLIDAY_THEME_PATH, THEME_COMPONENT_PARAMS
+from openpilot.frogpilot.common.frogpilot_utilities import delete_file, get_lock_status, run_cmd, extract_tar
 from openpilot.frogpilot.common.frogpilot_variables import ACTIVE_THEME_PATH, ERROR_LOGS_PATH, EXCLUDED_KEYS, RESOURCES_REPO, SCREEN_RECORDINGS_PATH, THEME_SAVE_PATH,\
                                                            frogpilot_default_params, params, params_memory, update_frogpilot_toggles
 from openpilot.frogpilot.system.the_pond import utilities
@@ -661,7 +661,9 @@ def setup(app):
     os.makedirs(state, exist_ok=True)
 
     run_cmd(["curl", "-fsSL", tgz_url, "-o", tgz_path], "Downloaded Tailscale archive.", "Failed to download Tailscale archive.")
-    run_cmd(["tar", "xzf", tgz_path, "-C", base], "Extracted Tailscale archive.", "Failed to extract Tailscale archive.")
+
+    extract_tar(tgz_path, base)
+
     run_cmd(["cp", f"{bin_dir}/tailscale", f"{base}/tailscale"], "Copied tailscale binary.", "Failed to copy tailscale binary.")
     run_cmd(["cp", f"{bin_dir}/tailscaled", f"{base}/tailscaled"], "Copied tailscaled binary.", "Failed to copy tailscaled binary.")
     run_cmd(["chmod", "+x", f"{base}/tailscale", f"{base}/tailscaled"], "Made binaries executable.", "Failed to chmod binaries.")
@@ -755,6 +757,26 @@ def setup(app):
     if error:
       return jsonify({"message": error}), 400
     return jsonify({"message": f'Theme "{request.form.get("themeName")}" saved!'}), 200
+
+  @app.route("/api/themes/download_asset", methods=["POST"])
+  def start_download_asset():
+    data = request.get_json() or {}
+    raw_component = (data.get("component") or "").strip()
+    display_name = (data.get("name") or "").strip()
+    if not raw_component or not display_name:
+      return jsonify({"error": "Missing component or name"}), 400
+
+    component = "steering_wheels" if raw_component == "steering_wheel" else ("signals" if raw_component == "turn_signals" else raw_component)
+    mem_key = THEME_COMPONENT_PARAMS.get(component)
+    if not mem_key:
+      return jsonify({"error": "Unknown component"}), 400
+
+    slug = display_name.lower().replace("(", "").replace(")", "").replace(" ", "_")
+
+    params_memory.put(mem_key, slug)
+    params_memory.put("ThemeDownloadProgress", "Downloading...")
+
+    return jsonify({"message": "Download started", "component": component, "param": mem_key, "slug": slug}), 200
 
   @app.route("/api/themes/apply", methods=["POST"])
   def apply_theme():
