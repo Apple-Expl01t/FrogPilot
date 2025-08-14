@@ -893,6 +893,14 @@
         <source>Record driving footage at double the standard bitrate for improved video quality in driving logs.</source>
         <translation type="gpt-4o-generated">Grave imagens de direção com o dobro da taxa de bits padrão para melhorar a qualidade do vídeo nos registros de direção.</translation>
     </message>
+    <message>
+        <source>Disable Internet Requirement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow the device to work indefinitely without an internet connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FrogPilotLateralPanel</name>
@@ -2103,6 +2111,62 @@
         <source>The &lt;b&gt;Map Based&lt;/b&gt; option is only available when some &lt;b&gt;Map Data&lt;/b&gt; has been downloaded!</source>
         <translation type="gpt-4o-generated">A opção &lt;b&gt;Baseado em Mapa&lt;/b&gt; está disponível apenas quando alguns &lt;b&gt;Dados de Mapa&lt;/b&gt; foram baixados!</translation>
     </message>
+    <message>
+        <source>Speed Limit Offset (0–24 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (25–34 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (35–44 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (45–54 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (55–64 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (65–74 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (75–99 mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (0–29 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (30–49 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (50–59 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (60–79 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (80–99 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (100–119 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Limit Offset (120–140 km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FrogPilotManageControl</name>
@@ -2614,6 +2678,18 @@ Ele será redefinido em %1 horas e %2 minutos.</translation>
     <message>
         <source>Offline...</source>
         <translation type="gpt-4o-generated">Offline...</translation>
+    </message>
+    <message>
+        <source>Device Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Speed Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically collect missing speed limits from your dashboard (if supported), &lt;b&gt;Mapbox&lt;/b&gt;, and &lt;b&gt;Navigate-on-openpilot&lt;/b&gt; while driving.&lt;br&gt;&lt;br&gt;Tap &lt;b&gt;Update Speed Limits&lt;/b&gt; at home (good Wi-Fi, 12V power) to process your recent drives.&lt;br&gt;&lt;br&gt;Download the data from &lt;b&gt;Fleet Manager&lt;/b&gt; → &lt;b&gt;Tools&lt;/b&gt; → &lt;b&gt;Download Speed Limits&lt;/b&gt;, then upload it to &lt;b&gt;SpeedLimitFiller.frogpilot.download&lt;/b&gt; to review and submit.&lt;br&gt;&lt;br&gt;For a full walkthrough, check the &lt;b&gt;#speed-limit-filler&lt;/b&gt; channel in the &lt;b&gt;FrogPilot Discord&lt;/b&gt;!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3144,6 +3220,10 @@ Quer enviar suas próprias animações? Compartilhe-as no canal "custom-themes" 
         <source>Turn Signal</source>
         <translation type="gpt-4o-generated">Sinal de Direção</translation>
     </message>
+    <message>
+        <source>Turn Signal Animation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FrogPilotUtilitiesPanel</name>
@@ -3350,6 +3430,26 @@ Quer enviar suas próprias animações? Compartilhe-as no canal "custom-themes" 
     <message>
         <source>Something else (please describe)</source>
         <translation type="gpt-4o-generated">Algo mais (por favor, descreva)</translation>
+    </message>
+    <message>
+        <source>I'm noticing harsh acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I'm noticing harsh braking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I'm noticing unusual steering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My car isn't staying in its lane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Something else</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4208,6 +4308,10 @@ Quer enviar suas próprias animações? Compartilhe-as no canal "custom-themes" 
     <message>
         <source>The width of the driving path on the driving screen.&lt;br&gt;&lt;br&gt;Default &lt;b&gt;(1.9 meters)&lt;/b&gt; matches the width of a &lt;b&gt;2019 Lexus ES 350&lt;/b&gt;.</source>
         <translation type="gpt-4o-generated">A largura do caminho de condução na tela de condução.&lt;br&gt;&lt;br&gt;O padrão &lt;b&gt;(1,9 metros)&lt;/b&gt; corresponde à largura de um &lt;b&gt;Lexus ES 350 de 2019&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>The width of the driving path on the driving screen.&lt;br&gt;&lt;br&gt;Default &lt;b&gt;(6.1 feet / 1.9 meters)&lt;/b&gt; matches the width of a &lt;b&gt;2019 Lexus ES 350&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
