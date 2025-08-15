@@ -13,7 +13,7 @@ class LatControlPID(LatControl):
                              k_f=CP.lateralTuning.pid.kf, pos_limit=self.steer_max, neg_limit=-self.steer_max)
     self.get_steer_feedforward = CI.get_steer_feedforward_function()
 
-  def update(self, active, CS, VM, params, steer_limited, desired_curvature, llk, model_data=None, frogpilot_toggles=None):
+  def update(self, active, CS, VM, params, steer_limited_by_safety, desired_curvature, curvature_limited, model_data=None, frogpilot_toggles=None):
     pid_log = log.ControlsState.LateralPIDState.new_message()
     pid_log.steeringAngleDeg = float(CS.steeringAngleDeg)
     pid_log.steeringRateDeg = float(CS.steeringRateDeg)
@@ -31,7 +31,7 @@ class LatControlPID(LatControl):
     else:
       # offset does not contribute to resistive torque
       ff = self.get_steer_feedforward(angle_steers_des_no_offset, CS.vEgo)
-      freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
+      freeze_integrator = steer_limited_by_safety or CS.steeringPressed or CS.vEgo < 5
 
       output_torque = self.pid.update(error,
                                 feedforward=ff,
@@ -43,6 +43,6 @@ class LatControlPID(LatControl):
       pid_log.i = float(self.pid.i)
       pid_log.f = float(self.pid.f)
       pid_log.output = float(output_torque)
-      pid_log.saturated = bool(self._check_saturation(self.steer_max - abs(output_torque) < 1e-3, CS, steer_limited, curvature_limited))
+      pid_log.saturated = bool(self._check_saturation(self.steer_max - abs(output_torque) < 1e-3, CS, steer_limited_by_safety, curvature_limited))
 
     return output_torque, angle_steers_des, pid_log

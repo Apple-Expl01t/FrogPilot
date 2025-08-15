@@ -156,7 +156,8 @@ class Controls:
     self.current_alert_types = [ET.PERMANENT]
     self.logged_comm_issue = None
     self.not_running_prev = None
-    self.steer_limited = False
+    self.steer_limited_by_safety = False
+    self.curvature = 0.0
     self.desired_curvature = 0.0
     self.experimental_mode = False
     self.personality = self.read_personality_param()
@@ -604,6 +605,9 @@ class Controls:
     sr = max(lp.steerRatio, 0.1)
     self.VM.update_params(x, sr)
 
+    steer_angle_without_offset = math.radians(CS.steeringAngleDeg - lp.angleOffsetDeg)
+    self.curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, lp.roll)
+
     # Update Torque Params
     if self.FPCP.lateralTuning.which() == 'torque':
       torque_params = self.sm['liveTorqueParameters']
@@ -660,14 +664,18 @@ class Controls:
         actuators.speed = long_plan.speeds[-1]
 
       # Steering PID loop and lateral MPC
-      self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
+      # Reset desired curvature to current to avoid violating the limits on engage
+      new_desired_curvature = model_v2.action.desiredCurvature if CC.latActive else self.curvature
+      self.desired_curvature, curvature_limited = clip_curvature(CS.vEgo, self.desired_curvature, new_desired_curvature, lp.roll)
+
       actuators.curvature = self.desired_curvature
-      steer, steer_angle, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
-                                                    self.steer_limited, self.desired_curvature,
-                                                    self.sm['liveLocationKalman'],
-                                                    model_data=self.sm['modelV2'], frogpilot_toggles=self.frogpilot_toggles)
+      steer, steeringAngleDeg, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
+                                                         self.steer_limited_by_safety, self.desired_curvature,
+                                                         curvature_limited,
+                                                         self.sm['liveLocationKalman'],
+                                                         model_data=model_v2, frogpilot_toggles=self.frogpilot_toggles))
       actuators.steer = float(steer)
-      actuators.steeringAngleDeg = float(steer_angle)
+      actuators.steeringAngleDeg = float(steeringAngleDeg)
 
     else:
       lac_log = log.ControlsState.LateralDebugState.new_message()
@@ -692,35 +700,22 @@ class Controls:
         lac_log.output = actuators.steer
         lac_log.saturated = abs(actuators.steer) >= 0.9
 
+    # Send a "steering required alert" if saturation count has reached the limit
     if CS.steeringPressed:
       self.last_steering_pressed_frame = self.sm.frame
     recent_steer_pressed = (self.sm.frame - self.last_steering_pressed_frame)*DT_CTRL < 2.0
-
-    # Send a "steering required alert" if saturation count has reached the limit
-    if lac_log.active and not recent_steer_pressed and not self.CP.notCar:
-      if self.FPCP.lateralTuning.which() == 'torque' and not self.joystick_mode:
-        undershooting = abs(lac_log.desiredLateralAccel) / abs(1e-3 + lac_log.actualLateralAccel) > 1.2
-        turning = abs(lac_log.desiredLateralAccel) > 1.0
-        good_speed = CS.vEgo > 5
-        max_torque = abs(self.sm['carOutput'].actuatorsOutput.steer) > 0.99
-        if undershooting and turning and good_speed and max_torque:
-          lac_log.active and self.frogpilot_events.add(FrogPilotEventName.goatSteerSaturated) if self.frogpilot_toggles.goat_scream_alert else self.events.add(EventName.steerSaturated)
-      elif lac_log.saturated:
-        # TODO probably should not use dpath_points but curvature
-        dpath_points = model_v2.position.y
-        if len(dpath_points):
-          # Check if we deviated from the path
-          # TODO use desired vs actual curvature
-          if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
-            steering_value = actuators.steeringAngleDeg
-          else:
-            steering_value = actuators.steer
-
-          left_deviation = steering_value > 0 and dpath_points[0] < -0.20
-          right_deviation = steering_value < 0 and dpath_points[0] > 0.20
-
-          if left_deviation or right_deviation:
-            self.events.add(EventName.steerSaturated)
+    if lac.active and not recent_steer_pressed and not self.CP.notCar:
+      clipped_speed = max(CS.vEgo, 0.3)
+      actual_lateral_accel = lac_log.curvature * (clipped_speed**2)
+      desired_lateral_accel = model_v2.action.desiredCurvature * (clipped_speed**2)
+      undershooting = abs(desired_lateral_accel) / abs(1e-3 + actual_lateral_accel) > 1.2
+      turning = abs(desired_lateral_accel) > 1.0
+      # TODO: lac.saturated includes speed and other checks, should be pulled out
+      if undershooting and turning and lac.saturated:
+        if self.frogpilot_toggles.goat_scream_alert:
+          self.frogpilot_events.add(FrogPilotEventName.goatSteerSaturated)
+        else:
+          self.events.add(EventName.steerSaturated)
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
@@ -833,10 +828,10 @@ class Controls:
     if not self.CP.passive and self.initialized:
       CO = self.sm['carOutput']
       if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
-        self.steer_limited = abs(CC.actuators.steeringAngleDeg - CO.actuatorsOutput.steeringAngleDeg) > \
-                             STEER_ANGLE_SATURATION_THRESHOLD
+        self.steer_limited_by_safety = abs(CC.actuators.steeringAngleDeg - CO.actuatorsOutput.steeringAngleDeg) > \
+                                              STEER_ANGLE_SATURATION_THRESHOLD
       else:
-        self.steer_limited = abs(CC.actuators.steer - CO.actuatorsOutput.steer) > 1e-2
+        self.steer_limited_by_safety = abs(CC.actuators.torque - CO.actuatorsOutput.torque) > 1e-2
 
     force_decel = (self.sm['driverMonitoringState'].awarenessStatus < 0.) or \
                   (self.state == State.softDisabling) or \

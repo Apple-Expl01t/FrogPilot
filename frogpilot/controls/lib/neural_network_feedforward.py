@@ -304,4 +304,4 @@ class NeuralNetworkFeedforward:
 
       self.nnLog = []
 
-    return torque_from_setpoint, torque_from_measurement, pid_log, ff
+    return pid_log, ff
