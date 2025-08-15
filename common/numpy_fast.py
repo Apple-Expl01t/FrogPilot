@@ -11,7 +11,8 @@ def interp(x, xp, fp):
     low = hi - 1
     return fp[-1] if hi == N and xv > xp[low] else (
       fp[0] if hi == 0 else
-      (xv - xp[low]) * (fp[hi] - fp[low]) / (xp[hi] - xp[low]) + fp[low])
+      (fp[low] if xp[hi] == xp[low] else  # Handle division by zero
+       (xv - xp[low]) * (fp[hi] - fp[low]) / (xp[hi] - xp[low]) + fp[low]))
 
   return [get_interp(v) for v in x] if hasattr(x, '__iter__') else get_interp(x)
 

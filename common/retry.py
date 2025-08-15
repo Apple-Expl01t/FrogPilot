@@ -11,14 +11,18 @@ def retry(attempts=3, delay=1.0, ignore_failure=False):
       for _ in range(attempts):
         try:
           return func(*args, **kwargs)
-        except Exception:
-          cloudlog.exception(f"{func.__name__} failed, trying again")
+        except (KeyboardInterrupt, SystemExit, MemoryError):
+          # Don't retry critical system exceptions
+          raise
+        except Exception as e:
+          cloudlog.exception(f"{func.__name__} failed, trying again: {e}")
           time.sleep(delay)
 
       if ignore_failure:
         cloudlog.error(f"{func.__name__} failed after retry")
+        return None
       else:
-        raise Exception(f"{func.__name__} failed after retry")
+        raise Exception(f"{func.__name__} failed after {attempts} retry attempts")
     return wrapper
   return decorator
 
