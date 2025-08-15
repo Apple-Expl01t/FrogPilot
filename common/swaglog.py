@@ -41,10 +41,16 @@ class SwaglogRotatingFileHandler(BaseRotatingHandler):
   def get_existing_logfiles(self):
     log_files = list()
     base_dir = os.path.dirname(self.base_filename)
-    for fn in os.listdir(base_dir):
-      fp = os.path.join(base_dir, fn)
-      if fp.startswith(self.base_filename) and os.path.isfile(fp):
-        log_files.append(fp)
+    try:
+      for fn in os.listdir(base_dir):
+        fp = os.path.join(base_dir, fn)
+        if fp.startswith(self.base_filename) and os.path.isfile(fp):
+          log_files.append(fp)
+    except (OSError, IOError) as e:
+      # Handle race condition where directory is being modified
+      cloudlog.warning(f"Failed to list log directory {base_dir}: {e}")
+      # Return empty list to prevent further errors
+      return []
     return sorted(log_files)
 
   def shouldRollover(self, record):
